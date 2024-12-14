@@ -4,6 +4,8 @@ public class Day13Part2
 {
     public void Run()
     {
+        throw new NotImplementedException("This part is not implemented");
+        
         var root = Environment.CurrentDirectory;
         var lines = File.ReadAllLines($@"{root}\input13.txt");
         var machines = new List<Machine>();
