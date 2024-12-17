@@ -41,44 +41,70 @@ public class Day16
             }
         }
 
-        Find(startReindeer, 0); //85400 too high
+        Find(); //85396 
 
         var c = costs.Where(r => r.Key.I == end.I && r.Key.J == end.J).Min(x=>x.Value);
-        Console.WriteLine(c); //85400 too high, so I found 85396 which was the correct answer by adding a limit of 85400 to the code ... muhahahha
-
-        void Find(Reindeer reindeer, int cost = 0)
+        Console.WriteLine(c); 
+ 
+        void Find()
         {
-            //arrived at stop
-            if (map[reindeer.I, reindeer.J] == '#')
-            {
-                return;
-            }
-
-            //been here before
-            if (cost > costs[reindeer] || cost>85400)
-                return;
-
-            costs[reindeer] = cost;
-
-            //arrived at end
-            if (map[reindeer.I, reindeer.J] == 'E')
-            {
-                return;
-            }
-
-            var offset = offsets[reindeer.Direction];
-
-            //Move
-            Find(new Reindeer(reindeer.I + offset[1], reindeer.J + offset[0], reindeer.Direction), cost + costMove);
+            var minCost = int.MaxValue;
+            var tasks = new List<ReindeerCost>() { new ReindeerCost(startReindeer,0) };
             
-            //90 CW
-            Find(new Reindeer(reindeer.I, reindeer.J, Rotate(reindeer.Direction, 1)),cost + costRotate);
+            while(true)
+            {
+                if (tasks.Count == 0)
+                    break;
 
-            //90 CCW
-            Find(new Reindeer(reindeer.I, reindeer.J, Rotate(reindeer.Direction, -1)), cost + costRotate);
-            
-            //180
-            Find(new Reindeer(reindeer.I ,reindeer.J, Rotate(reindeer.Direction, 2)),cost + costRotate*2);
+                var task = tasks.First();
+                tasks.RemoveAt(0);
+                
+                var reindeer = task.Reindeer;
+                var cost = task.Cost;
+                
+                //too expensive
+                if (cost >= minCost)
+                {
+                    continue;
+                }
+                
+                //arrived at stop
+                if (map[reindeer.I, reindeer.J] == '#')
+                {
+                    continue;
+                }
+
+                //been here before
+                if (cost > costs[reindeer])
+                    continue;
+
+                costs[reindeer] = cost;
+
+                //arrived at end
+                if (map[reindeer.I, reindeer.J] == 'E')
+                {
+                    minCost = cost;
+                    continue;
+                }
+
+                var offset = offsets[reindeer.Direction];
+
+                //Move
+                var c  =cost +costMove;
+                tasks.Add( new ReindeerCost(new Reindeer(reindeer.I + offset[1], reindeer.J + offset[0], reindeer.Direction), c));
+                
+                //90 CW
+                c = cost + costRotate;
+                tasks.Add( new ReindeerCost(new Reindeer(reindeer.I, reindeer.J, Rotate(reindeer.Direction, 1)),c));
+
+                //90 CCW
+                c = cost + costRotate;
+                tasks.Add(new ReindeerCost(new Reindeer(reindeer.I, reindeer.J, Rotate(reindeer.Direction, -1)), c));
+                
+                //180
+                c = cost + costRotate * 2;
+                tasks.Add(new ReindeerCost(new Reindeer(reindeer.I ,reindeer.J, Rotate(reindeer.Direction, 2)),c));
+            }
         }
 
         char Rotate(char chr, int offset)
@@ -101,6 +127,8 @@ public class Day16
             }
         }
     }
+
+    record ReindeerCost(Reindeer Reindeer, int Cost);
 
     record Reindeer(int I, int J, char Direction);
 
