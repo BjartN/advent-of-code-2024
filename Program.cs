@@ -1,5 +1,5 @@
 ﻿
 using AdventOfCode;
 
-new Day15().Run();
+new Day16().Run();
 
