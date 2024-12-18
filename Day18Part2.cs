@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode;
 
-public class Day18
+public class Day18Part2
 {
     public void Run()
     {
@@ -11,7 +11,6 @@ public class Day18
         var points = File
             .ReadAllLines($@"{root}\input18.txt")
             .Select(line => line.Split(',').Select(int.Parse).ToArray())
-            .Take(numBytes)
             .ToArray();
 
         var offsets = new[]
@@ -25,22 +24,20 @@ public class Day18
         var map = new char[gridSize, gridSize];
         var costs = new int[gridSize, gridSize];
         
-        for (var i = 0; i < map.GetLength(0); i++)
+        while (true)
         {
-            for (var j = 0; j < map.GetLength(1); j++)
+            ResetMap();
+            Search();
+
+            if (costs[gridSize - 1, gridSize - 1] == int.MaxValue)
             {
-                map[i, j] = '.';
-                costs[i, j] = int.MaxValue;
+                var targetByte = points.Take(numBytes).Last();
+                Console.WriteLine($"{targetByte.First()},{targetByte.Last()}"); //64,29
+                break;
             }
+            
+            numBytes++;
         }
-
-        foreach (var pt in points)
-        {
-            map[pt[1], pt[0]] = '#';
-        }
-
-        Search();
-        Console.WriteLine(costs[gridSize-1,gridSize-1]); //282
         
         void Search()
         {
@@ -66,7 +63,7 @@ public class Day18
                 if (map[task.Y, task.X] == '#')
                     continue;
 
-                if(costs[task.Y, task.X]<=task.Cost)
+                if(costs[task.Y, task.X]<=task.Cost || task.Cost>(gridSize*gridSize))
                     continue;
 
                 if (task.X == gridSize - 1 && task.Y == gridSize - 1)
@@ -76,6 +73,22 @@ public class Day18
                 
                 foreach (var offset in offsets)
                     tasks.Enqueue(new Pt(task.X+offset[1] , task.Y+ offset[0], task.Cost+1));
+            }
+        }
+
+        void ResetMap()
+        {
+            for (var i = 0; i < map.GetLength(0); i++)
+            {
+                for (var j = 0; j < map.GetLength(1); j++)
+                {
+                    map[i, j] = '.';
+                    costs[i, j] = int.MaxValue;
+                }
+            }
+            foreach (var pt in points.Take(numBytes))
+            {
+                map[pt[1], pt[0]] = '#';
             }
         }
     }
