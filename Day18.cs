@@ -14,7 +14,7 @@ public class Day18
             .Take(numBytes)
             .ToArray();
 
-        var offsets = new int[][]
+        var offsets = new[]
         {
             new[] { 1, 0 } ,
             new[] { 0, 1 } ,
@@ -39,28 +39,20 @@ public class Day18
             map[pt[1], pt[0]] = '#';
         }
 
-        Print();
         Search();
-        Print();
-        
         Console.WriteLine(costs[gridSize-1,gridSize-1]); //282
         
         void Search()
         {
             var minCost = int.MaxValue;
-            var tasks = new List<Pt> { new Pt(0, 0,0) };
+            var tasks = new Queue<Pt>();
+            tasks.Enqueue(new Pt(0, 0, 0));
 
-            var i = 0;
             while (true)
             {
-                i++;
                 if (tasks.Count == 0)
                     break;
-                var task = tasks.First();
-                tasks.RemoveAt(0);
-                
-                if(i % 1000000 == 0)
-                    Console.WriteLine($"Tasks {tasks.Count}");
+                var task = tasks.Dequeue();
                 
                 if(task.X<0 || task.X>gridSize-1)
                     continue;
@@ -83,9 +75,7 @@ public class Day18
                 costs[task.Y, task.X] = task.Cost;
                 
                 foreach (var offset in offsets)
-                {
-                    tasks.Add(new Pt(task.X+offset[1] , task.Y+ offset[0], task.Cost+1));
-                }
+                    tasks.Enqueue(new Pt(task.X+offset[1] , task.Y+ offset[0], task.Cost+1));
             }
         }
         
